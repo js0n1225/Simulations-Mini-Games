@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDOS Attack Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const DDOSSimulation = () => {
+            const [serverHealth, setServerHealth] = React.useState(100);
+            const [attackWaves, setAttackWaves] = React.useState(0);
+            const [attackSpeed, setAttackSpeed] = React.useState(1);
+
+            const startDDOSAttack = () => {
+                const damageAmount = 10 * attackSpeed;
+                setServerHealth(prevHealth => Math.max(0, prevHealth - damageAmount));
+                setAttackWaves(prev => prev + 1);
+            };
+
+            const incrementAttackSpeed = () => {
+                setAttackSpeed(prev => Math.min(5, prev + 0.5));
+            };
+
+            const resetSimulation = () => {
+                setServerHealth(100);
+                setAttackWaves(0);
+                setAttackSpeed(1);
+            };
+
+            const isServerDown = serverHealth <= 0;
+
+            return (
+                <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-6">
+                    <h1 className="text-2xl font-bold text-center mb-6">DDOS Attack Simulation</h1>
+                    <div className="relative">
+                        <div className="w-full h-[300px] border rounded-lg overflow-hidden flex flex-col justify-center items-center">
+                            <div 
+                                className="w-48 h-48 bg-blue-500 rounded-lg flex items-center justify-center mb-4 transition-transform duration-300"
+                                style={{
+                                    transform: `scale(${1 + (5 - serverHealth/20)/10})`,
+                                    backgroundColor: `rgb(33, 150, 243, ${serverHealth/100})`
+                                }}
+                            >
+                                <span className="text-white font-bold text-lg">Server</span>
+                            </div>
+                            
+                            <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden mt-4">
+                                <div 
+                                    className="h-full bg-green-500 transition-all duration-300" 
+                                    style={{ width: `${serverHealth}%` }}
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 text-center">
+                            <p>Server Health: {serverHealth}%</p>
+                            <p>Attack Speed: {attackSpeed}x</p>
+                            <p>Attack Waves: {attackWaves}</p>
+                            {isServerDown && (
+                                <p className="text-red-500 font-bold mt-2">
+                                    Server Overwhelmed! DDOS Attack Successful
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex justify-center space-x-4 mt-6">
+                        <button 
+                            onClick={startDDOSAttack} 
+                            disabled={isServerDown}
+                            className={`px-4 py-2 rounded ${
+                                isServerDown 
+                                    ? 'bg-red-500 text-white opacity-50 cursor-not-allowed' 
+                                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                            }`}
+                        >
+                            Launch Attack
+                        </button>
+                        <button 
+                            onClick={incrementAttackSpeed}
+                            disabled={isServerDown}
+                            className={`px-4 py-2 rounded ${
+                                isServerDown 
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                    : 'bg-green-500 text-white hover:bg-green-600'
+                            }`}
+                        >
+                            Increase Attack Speed
+                        </button>
+                        <button 
+                            onClick={resetSimulation}
+                            className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
+                        >
+                            Reset Simulation
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<DDOSSimulation />, document.getElementById('root'));
+    </script>
+</body>
+</html>
